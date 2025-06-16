@@ -1,22 +1,22 @@
 #include <Arduino.h>
 
-//Partie Initialisation des Pins
+// Partie Initialisation des Pins
 
-#define PIN_DI 34
-#define PIN_GI 35
+#define PIN_GI 34
+#define PIN_GE 35
 #define PIN_DE 36
-#define PIN_GE 39
-#define PWM_1 5
-#define PWM_2 16
-#define Bouton_Vert 32
-#define Bouton_Bleu 33
+#define PIN_DI 39
+#define PWM_Droite 5
+#define PWM_Gauche 16
+// #define Bouton_Vert 32
+// #define Bouton_Bleu 33
 
 int PWM_FREQUENCY = 5000;
 int PWM_RESOLUTION = 8;
 int PWM_CHANNEL_1 = 0;
 int PWM_CHANNEL_2 = 1;
 
-//Partie Fonctionenment
+// Partie Fonctionenment
 
 void setup()
 {
@@ -25,22 +25,30 @@ void setup()
   pinMode(PIN_GI, INPUT);
   pinMode(PIN_DE, INPUT);
   pinMode(PIN_GE, INPUT);
-  pinMode(Bouton_Vert, INPUT);
-  pinMode(Bouton_Bleu, INPUT);
+  // pinMode(Bouton_Vert, INPUT);
+  // pinMode(Bouton_Bleu, INPUT);
   ledcSetup(PWM_CHANNEL_1, PWM_FREQUENCY, PWM_RESOLUTION);
   ledcSetup(PWM_CHANNEL_2, PWM_FREQUENCY, PWM_RESOLUTION);
-  ledcAttachPin(PWM_1, PWM_CHANNEL_1);
-  ledcAttachPin(PWM_2, PWM_CHANNEL_2);
+  ledcAttachPin(PWM_Droite, PWM_CHANNEL_1);
+  ledcAttachPin(PWM_Gauche, PWM_CHANNEL_2);
 }
 
 void loop()
 {
-  int val1 = analogRead(PIN_DI);
-  int val2 = analogRead(PIN_GI);
-  int val3 = analogRead(PIN_DE);
-  int val4 = analogRead(PIN_GE);
-  char boutonVert = digitalRead(Bouton_Vert);
-  char boutonBleu = digitalRead(Bouton_Bleu);
-  ledcWrite(PWM_CHANNEL_1, 255);
-  ledcWrite(PWM_CHANNEL_2, 255);
+  int DroiteInterieur = analogRead(PIN_DI);
+  int GaucheInterieur = analogRead(PIN_GI);
+  int DroiteExterieur = analogRead(PIN_DE);
+  int GaucheExterieur = analogRead(PIN_GE);
+  // char BoutonVert = digitalRead(Bouton_Vert);
+  // char BoutonBleu = digitalRead(Bouton_Bleu);
+  if (GaucheInterieur < 2000)
+  {
+    ledcWrite(PWM_CHANNEL_1, 0); // Stop PWM on right motor
+    ledcWrite(PWM_CHANNEL_2, 127); // Start PWM on left motor
+  }
+  else
+  {
+    ledcWrite(PWM_CHANNEL_1, 127); // Start PWM on right motor
+    ledcWrite(PWM_CHANNEL_2, 127); // Stop PWM on left motor
+  }
 }
