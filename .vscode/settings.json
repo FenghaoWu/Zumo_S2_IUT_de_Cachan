@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "atomic": "cpp",
-        "cstdint": "cpp"
+        "cstdint": "cpp",
+        "cmath": "cpp",
+        "random": "cpp"
     }
 }
