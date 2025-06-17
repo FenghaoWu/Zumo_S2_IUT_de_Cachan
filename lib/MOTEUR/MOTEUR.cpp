@@ -36,11 +36,11 @@ void moteur_droit(int pwm)
 
     ledcWrite(PWM_CHANNEL_2_DROITE, complement_pwm);
     ledcWrite(PWM_CHANNEL_3_DROITE, pwm);
-    Serial.print("PWM Droit: ");
-    Serial.print(pwm);
-    Serial.print(" Complement PWM Droit: ");
-    Serial.print(complement_pwm);
-    Serial.println();
+    // Serial.print("PWM Droit: ");
+    // Serial.print(pwm);
+    // Serial.print(" Complement PWM Droit: ");
+    // Serial.print(complement_pwm);
+    // Serial.println();
 }
 
 void moteur_gauche(int pwm)
@@ -51,9 +51,9 @@ void moteur_gauche(int pwm)
 
     ledcWrite(PWM_CHANNEL_0_GAUCHE, complement_pwm);
     ledcWrite(PWM_CHANNEL_1_GAUCHE, pwm);
-    Serial.print("PWM Gauche: ");
-    Serial.print(pwm);
-    Serial.print(" Complement PWM Gauche: ");
-    Serial.print(complement_pwm);
-    Serial.println();
+    // Serial.print("PWM Gauche: ");
+    // Serial.print(pwm);
+    // Serial.print(" Complement PWM Gauche: ");
+    // Serial.print(complement_pwm);
+    // Serial.println();
 }

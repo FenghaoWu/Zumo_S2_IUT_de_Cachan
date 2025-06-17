@@ -10,8 +10,9 @@
 #define SDA 21
 #define SCL 22
 
-// #define Bouton_Vert 32
-// #define Bouton_Bleu 33
+int erreur = 0;
+int correction = 0;
+float Kp = 0.05; // Coefficient de proportionnalité pour la correction
 
 // Partie Fonctionenment
 
@@ -22,30 +23,31 @@ void setup()
   pinMode(PIN_GI, INPUT);
   pinMode(PIN_DE, INPUT);
   pinMode(PIN_GE, INPUT);
-
   setup_moteur_pwm(20000, 10);
-  // pinMode(Bouton_Vert, INPUT);
-  // pinMode(Bouton_Bleu, INPUT);
+  moteur_droit(511);
+  moteur_gauche(511);
 }
+
 
 void loop()
 {
-  int DroiteInterieur = analogRead(PIN_DI);
-  int GaucheInterieur = analogRead(PIN_GI);
-  int DroiteExterieur = analogRead(PIN_DE);
-  int GaucheExterieur = analogRead(PIN_GE);
+  int DroiteInterieur = abs(4095 - analogRead(PIN_DI));
+  int GaucheInterieur = abs(4095 - analogRead(PIN_GI));
+  int DroiteExterieur = abs(4095 - analogRead(PIN_DE));
+  int GaucheExterieur = abs(4095 - analogRead(PIN_GE));
 
-  // char BoutonVert = digitalRead(Bouton_Vert);
-  // char BoutonBleu = digitalRead(Bouton_Bleu);
+  erreur = DroiteInterieur - GaucheInterieur;
+  correction = Kp * erreur;
 
-  moteur_droit(800);
-  moteur_gauche(800);
+  moteur_droit(511 + correction);
+  moteur_gauche(511 - correction);
 
-  delay(2500);
-  // moteur_droit(0);
-  // moteur_gauche(0);
-  // delay(2500);
-
-  // ledcWrite(PWM_CHANNEL_2_DROITE, 0);
-  // ledcWrite(PWM_CHANNEL_3_DROITE, 1020);
+  Serial.print("Droite Interieur: ");
+  Serial.print(DroiteInterieur);
+  Serial.print(" | Gauche Interieur: ");
+  Serial.print(GaucheInterieur);
+  Serial.print(" | Erreur: ");
+  Serial.print(erreur);
+  Serial.print(" | Correction: ");
+  Serial.println(correction);
 }
