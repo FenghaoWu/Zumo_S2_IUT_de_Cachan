@@ -1,7 +1,7 @@
 #include "MOTEUR.h"
 #include <Arduino.h>
 
-// Partie Initialisation des Pins
+// INITIALISATION
 
 #define PIN_GI 34
 #define PIN_GE 35
@@ -10,11 +10,13 @@
 #define SDA 21
 #define SCL 22
 
-int erreur = 0;
-int correction = 0;
-float Kp = 0.05; // Coefficient de proportionnalité pour la correction
+#define PWM_Base 511
+#define PWM_Min 0
 
-// Partie Fonctionenment
+int erreur, correction = 0;
+float Kp = 0.05;
+
+// FONCTIONNEMENT
 
 void setup()
 {
@@ -24,30 +26,37 @@ void setup()
   pinMode(PIN_DE, INPUT);
   pinMode(PIN_GE, INPUT);
   setup_moteur_pwm(20000, 10);
-  moteur_droit(511);
-  moteur_gauche(511);
+  moteur_droit(PWM_Min);
+  moteur_gauche(PWM_Min);
 }
 
 
 void loop()
 {
-  int DroiteInterieur = abs(4095 - analogRead(PIN_DI));
-  int GaucheInterieur = abs(4095 - analogRead(PIN_GI));
-  int DroiteExterieur = abs(4095 - analogRead(PIN_DE));
-  int GaucheExterieur = abs(4095 - analogRead(PIN_GE));
+  int DroiteInterieur = abs(analogRead(PIN_DI));
+  int GaucheInterieur = abs(analogRead(PIN_GI));
+  int DroiteExterieur = abs(analogRead(PIN_DE));
+  int GaucheExterieur = abs(analogRead(PIN_GE));
 
-  erreur = DroiteInterieur - GaucheInterieur;
+  erreur = GaucheInterieur - DroiteInterieur;
   correction = Kp * erreur;
 
-  moteur_droit(511 + correction);
-  moteur_gauche(511 - correction);
+  moteur_droit(PWM_Base - correction);
+  moteur_gauche(PWM_Base + correction);
 
-  Serial.print("Droite Interieur: ");
-  Serial.print(DroiteInterieur);
+  Serial.print("Gauche Exterieur: ");
+  Serial.print(GaucheExterieur);
   Serial.print(" | Gauche Interieur: ");
   Serial.print(GaucheInterieur);
+  Serial.print(" | Droite Interieur: ");
+  Serial.print(DroiteInterieur);
+  Serial.print(" | Droite Exterieur: ");
+  Serial.print(DroiteExterieur);
   Serial.print(" | Erreur: ");
   Serial.print(erreur);
-  Serial.print(" | Correction: ");
-  Serial.println(correction);
+  Serial.print(" | moteur droit: ");
+  Serial.print(511 + correction);
+  Serial.print(" | moteur gauche: ");
+  Serial.println(511 - correction);
+  delay(100);
 }

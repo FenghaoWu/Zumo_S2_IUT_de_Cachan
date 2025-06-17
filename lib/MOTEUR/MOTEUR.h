@@ -6,7 +6,7 @@
 #define PWM_DROITE 16
 
 // const int PWM_FREQUENCY = 20000;
-#define PWM_RESOLUTION  10 // Resolution in bits
+#define PWM_RESOLUTION  10
 #define PWM_CHANNEL_GAUCHE 0
 #define PWM_CHANNEL_DROITE 1
 
