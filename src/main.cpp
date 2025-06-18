@@ -17,8 +17,8 @@ float erreur;
 float erreur_precedente = 0;
 
 float correction = 0;
-float Kp = 1.5;
-float Kd = 0;
+float Kp = 3;
+float Kd = 6;
 // FONCTIONNEMENT
 
 void setup()
@@ -68,5 +68,12 @@ void loop()
   // Serial.print(" | moteur gauche: ");
   // Serial.println(PWM_Base + correction);
   // delay(100);                                 temps en milliseconde
+
+
+ // pour arreter les moteurs pendant 5s si les 2 capteurs exterrieurs captes la ligne
+  //if (PIN_GE && PIN_DE)
+   // {
+  //    delay(5000);
+   // }
 
 }
