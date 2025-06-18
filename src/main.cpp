@@ -18,7 +18,7 @@ float erreur_precedente = 0;
 
 float correction = 0;
 float Kp = 1.5;
-float Kd = 0;
+float Kd = 2;
 // FONCTIONNEMENT
 
 void setup()
