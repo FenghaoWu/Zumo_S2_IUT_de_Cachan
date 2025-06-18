@@ -67,5 +67,6 @@ void loop()
   // Serial.print(PWM_Base - correction);
   // Serial.print(" | moteur gauche: ");
   // Serial.println(PWM_Base + correction);
-  // delay(100);
+  // delay(100);                                 temps en milliseconde
+
 }
