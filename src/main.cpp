@@ -1,6 +1,6 @@
 #include "MOTEUR.h"
 #include <Arduino.h>
-// PDAJDOAJ
+
 // INITIALISATION
 
 #define PIN_GI 34
@@ -18,7 +18,7 @@ float erreur_precedente = 0;
 
 float correction = 0;
 float Kp = 1.5;
-float Kd = 2;
+float Kd = 0;
 // FONCTIONNEMENT
 
 void setup()
