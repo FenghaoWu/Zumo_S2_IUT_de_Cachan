@@ -10,15 +10,15 @@
 // #define SDA 21
 // #define SCL 22
 
-#define PWM_Base 511
-#define PWM_Min 0
+#define PWM_Base 850//511
+#define PWM_Min 0 
 
 float erreur;
 float erreur_precedente = 0;
 
 float correction = 0;
-float Kp = 3;
-float Kd = 6;
+float Kp = 1.2;
+float Kd = 4;
 // FONCTIONNEMENT
 
 void setup()
@@ -75,5 +75,5 @@ void loop()
    // {
   //    delay(5000);
    // }
-
-}
+ 
+} 
