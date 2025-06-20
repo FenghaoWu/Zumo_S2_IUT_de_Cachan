@@ -26,7 +26,7 @@ float Kp = 1.3;
 float Kd = 3;
 int etat = 0;
 int coeff_stop_moteur = 1;
-int seuil = 700;
+int seuil = 1000;
 
 // FONCTIONNEMENT
 
@@ -86,11 +86,11 @@ void loop()
   switch (etat)
   {
   case 0:
-    etat = 0;
-    if (boutonvert == 1)
-    {
+    // etat = 0;
+    // if (boutonvert == 1)
+    // {
       etat = 1;
-    }
+    // }
 
     lcd.setRGB(255, 255, 0);
     lcd.setCursor(0, 1);
@@ -112,14 +112,7 @@ void loop()
     }
     break;
 
-    // case 2:
-    //   coeff_stop_moteur = 0;
-    //   etat = 0;
-    //   break;
-
   case 3:
-    // moteur_droit(0);
-    // moteur_gauche(0);
     // delay(5000);
     coeff_stop_moteur = 0;
     lcd.setRGB(255, 0, 0);
