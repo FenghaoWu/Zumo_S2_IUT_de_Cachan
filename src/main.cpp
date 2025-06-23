@@ -2,8 +2,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "rgb_lcd.h"
-
-rgb_lcd lcd;
+#include "Adafruit_TCS34725.h"
 
 // INITIALISATION
 
@@ -13,8 +12,7 @@ rgb_lcd lcd;
 #define PIN_GE 35
 #define PIN_DE 36
 #define PIN_DI 39
-
-#define PWM_Base 511 // 511
+#define PWM_Base 511
 #define PWM_Min 0
 
 float erreur;
@@ -23,9 +21,9 @@ float correction = 0;
 float Kp = 1.5;
 float Kd = 3;
 int etat = 0;
-// int coeff_stop_moteur = 1;
 int seuil = 1000;
 unsigned long TempsAttente = 0;
+rgb_lcd lcd;
 
 // FONCTIONNEMENT
 
@@ -39,8 +37,8 @@ void setup()
   setup_moteur_pwm(20000, 10);
   moteur_droit(PWM_Min);
   moteur_gauche(PWM_Min);
-  pinMode(PIN_BP0, INPUT_PULLDOWN); // BP0 en entré
-  pinMode(PIN_BP1, INPUT_PULLDOWN); // BP1 en entré
+  pinMode(PIN_BP0, INPUT_PULLDOWN);
+  pinMode(PIN_BP1, INPUT_PULLDOWN);
   lcd.begin(16, 2);
 }
 
@@ -71,7 +69,6 @@ void loop()
     }
     else
     {
-      lcd.clear();
       moteur_droit(PWM_Min);
       moteur_gauche(PWM_Min);
     }
