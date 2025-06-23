@@ -1,10 +1,12 @@
+//--------------------BIBLIOTHEQUES--------------------//
+
 #include "MOTEUR.h"
 #include <Arduino.h>
 #include <Wire.h>
 #include "Adafruit_TCS34725.h"
 // #include "rgb_lcd.h"
 
-// INITIALISATION PIN
+//--------------------INITIALISATION DES PINS--------------------//
 
 #define PIN_BP0 32 // déclaration bouton BP0
 #define PIN_BP1 33 // déclaration bouton BP1
@@ -17,7 +19,7 @@
 #define I2C_SDA 22
 #define I2C_SCL 21
 
-// INITIALISATION DES VARIABLES
+//--------------------INITIALISATION DES VARIABLES--------------------//
 
 float erreur;
 float erreur_precedente = 0;
@@ -28,13 +30,13 @@ int etat = 0;
 int seuil = 1000;
 unsigned long TempsAttente = 0;
 uint16_t R, G, B, C;
+int couleur = 0; // 0 = INCONNUE, 1 = ROUGE, 2 = BLEU
 
-// INITIALISATION SPECIALE
+//--------------------INITIALISATION SPECIALE--------------------//
 
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
-// rgb_lcd lcd;
 
-// FONCTIONNEMENT
+//--------------------FONCTIONNEMENT INITIALISATION--------------------//
 
 void setup()
 {
@@ -49,8 +51,9 @@ void setup()
   pinMode(PIN_BP0, INPUT_PULLDOWN);
   pinMode(PIN_BP1, INPUT_PULLDOWN);
   Wire.begin(I2C_SDA, I2C_SCL);
-  // lcd.begin(16, 2);
 }
+
+//--------------------FONCTIONNEMENT EXECUTION--------------------//
 
 void loop()
 {
@@ -60,19 +63,16 @@ void loop()
   int GaucheExterieur = abs(analogRead(PIN_GE));
   int boutonvert = digitalRead(PIN_BP0);
   int boutonbleu = digitalRead(PIN_BP1);
-  tcs.getRawData(&R, &G, &B, &C);
-  int rouge = (float) R / C * 255.0;
-  int vert = (float) G / C * 255.0;
-  int bleu = (float) B / C * 255.0;
-
-  // lcd.setRGB(255, 127, 0);
+  tcs.getRawData(&R, &G, &B, &C); // R rouge, G vert, B bleu et C luminosité
+  int rouge = (float)R / C * 255.0;
+  int vert = (float)G / C * 255.0;
+  int bleu = (float)B / C * 255.0;
 
   switch (etat)
   {
   case 0: // Phase attente de demarrage
 
-    Serial.println("R: " + String(rouge) + " G: " + String(vert) + " B: " + String(bleu) + " C: " + String(C));
-    delay(300);
+    // Serial.println("Couleur: " + String(couleur) + " | " + " R: " + String(rouge) + " G: " + String(vert) + " B: " + String(bleu));
 
     if (boutonvert == 1)
     {
@@ -130,6 +130,19 @@ void loop()
     moteur_droit(PWM_Min);
     moteur_gauche(PWM_Min);
 
+    if (rouge > bleu && rouge < 95)
+    {
+      couleur = 1;
+    }
+    else if (bleu > rouge)
+    {
+      couleur = 2;
+    }
+    else
+    {
+      couleur = 0;
+    }
+    
     if (millis() - TempsAttente >= 3000)
     {
       TempsAttente = millis();
