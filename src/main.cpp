@@ -1,10 +1,11 @@
-//--------------------BIBLIOTHEQUES--------------------//
+//--------------------------BIBLIOTHEQUES--------------------------//
 
 #include "MOTEUR.h"
 #include <Arduino.h>
 #include <Wire.h>
+#include <Wifi.h>
 #include "Adafruit_TCS34725.h"
-// #include "rgb_lcd.h"
+#include <ModbusIP_ESP8266.h>
 
 //--------------------INITIALISATION DES PINS--------------------//
 
@@ -25,16 +26,21 @@ float erreur;
 float erreur_precedente = 0;
 float correction = 0;
 float Kp = 1.5;
-float Kd = 3;
+float Kd = 2.0;
 int etat = 0;
 int seuil = 1000;
 unsigned long TempsAttente = 0;
-uint16_t R, G, B, C;
+uint16_t R, G, B, C, reg;
+int rouge, vert, bleu;
 int couleur = 0; // 0 = INCONNUE, 1 = ROUGE, 2 = BLEU
+const char *ssid = "Wifi_Test";
+const char *password = "12345678";
 
 //--------------------INITIALISATION SPECIALE--------------------//
 
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+IPAddress plcIP(192, 168, 0, 104);
+ModbusIP mb;
 
 //--------------------FONCTIONNEMENT INITIALISATION--------------------//
 
@@ -51,6 +57,21 @@ void setup()
   pinMode(PIN_BP0, INPUT_PULLDOWN);
   pinMode(PIN_BP1, INPUT_PULLDOWN);
   Wire.begin(I2C_SDA, I2C_SCL);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial.println("Connexion au WiFi...");
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConnecté au WiFi");
+  Serial.println("Adresse IP: " + WiFi.localIP().toString());
+  delay(1000);
+
+  mb.server();
+  mb.addHreg(40000, 0);
+  mb.addCoil(40001);
 }
 
 //--------------------FONCTIONNEMENT EXECUTION--------------------//
@@ -63,16 +84,12 @@ void loop()
   int GaucheExterieur = abs(analogRead(PIN_GE));
   int boutonvert = digitalRead(PIN_BP0);
   int boutonbleu = digitalRead(PIN_BP1);
-  tcs.getRawData(&R, &G, &B, &C); // R rouge, G vert, B bleu et C luminosité
-  int rouge = (float)R / C * 255.0;
-  int vert = (float)G / C * 255.0;
-  int bleu = (float)B / C * 255.0;
 
   switch (etat)
   {
   case 0: // Phase attente de demarrage
 
-    // Serial.println("Couleur: " + String(couleur) + " | " + " R: " + String(rouge) + " G: " + String(vert) + " B: " + String(bleu));
+    Serial.println("Registre: " + String(reg));
 
     if (boutonvert == 1)
     {
@@ -97,7 +114,6 @@ void loop()
 
     if ((GaucheExterieur < seuil) && (DroiteExterieur < seuil))
     {
-      TempsAttente = millis();
       etat = 3;
     }
 
@@ -130,23 +146,41 @@ void loop()
     moteur_droit(PWM_Min);
     moteur_gauche(PWM_Min);
 
+    tcs.getRawData(&R, &G, &B, &C); // R rouge, G vert, B bleu et C luminosité
+    rouge = (float)R / C * 255.0;
+    vert = (float)G / C * 255.0;
+    bleu = (float)B / C * 255.0;
+
     if (rouge > bleu && rouge < 95)
     {
-      couleur = 1;
+      couleur = 1; // 1 = ROUGE
     }
     else if (bleu > rouge)
     {
-      couleur = 2;
+      couleur = 2; // 2 = BLEU
     }
     else
     {
-      couleur = 0;
+      couleur = 0; // 0 = INCONNUE
     }
-    
-    if (millis() - TempsAttente >= 3000)
+
+    mb.Coil(40001, couleur); // Envoie de la couleur au PLC
+    reg = mb.Hreg(40000); // Lecture depuis le PLC
+    mb.task(); // Mise à jour de la valeur du registre pour la variable reg afin de pouvoir l'utiliser dans le switch
+
+    switch(reg)
     {
-      TempsAttente = millis();
-      etat = 2;
+      case 0:
+
+        etat = 2;
+
+        break;
+
+      case 1:
+
+        etat = 3;
+
+        break;
     }
 
     if (boutonbleu == 1) // Bouton bleu pour arret d'urgence
